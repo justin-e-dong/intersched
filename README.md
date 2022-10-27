@@ -8,4 +8,5 @@
 ## Git Note
 
 For using the SSH key I want to push to GitHub from the 4socket server:
-`git config --add --local core.sshCommand 'ssh -i ~/.ssh/int_traces'`
+
+```git config --add --local core.sshCommand 'ssh -i ~/.ssh/int_traces'```
