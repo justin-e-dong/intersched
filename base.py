@@ -44,9 +44,6 @@ def get_snapshot():
         with open(f"{DATA_DIR}/col_labels.json", "w") as f:
             json.dump(col_labels, f)
 
-    print(len(row_labels))
-    print(len(col_labels))
-
     return np.array(res), now
 
 # interval in seconds
