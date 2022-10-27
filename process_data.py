@@ -67,12 +67,24 @@ plot_times = plot_times[1:]
 # plot the interrupt rate, rather than the number of interrupts
 # (change from the previous collection of interrupts)
 
-plt.plot(plot_times, ints_rate_s)
+all_non_zero_indices = np.where(np.all(ints_change != 0, axis=0))[0]
+ints_rate_s_filtered = np.take(ints_rate_s, all_non_zero_indices, axis=1)
+
+z_ind_set = set(all_non_zero_indices)
+labels = []
+for (i, l) in enumerate(row_labels):
+    if i in z_ind_set:
+        labels.append(l)
+
+print(labels)
+print('Done processing, displaying plot now')
+
+plt.plot(plot_times, ints_rate_s_filtered, label=labels)
 
 plt.title("Interrupt Rate")
 
 plt.xlabel('Time (s)')
 plt.ylabel('Interrupt Rate')
 
-# plt.legend(loc='upper right')
+plt.legend(loc='upper right')
 plt.show()

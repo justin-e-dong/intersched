@@ -1,5 +1,9 @@
 ## Interrupt Traces
 
+This is only for coarse-grained interrupt collection. We do not know precisely when interrupts happen, you need to collect that sort of data at the kernel level
+
+Important note: need to consider that the Python script you are running to collect the data impacts the interrupt counts. Collecting data at kernel level probably would not have as great of an impact
+
 ## TODO
 
 - Create cron job to collect at 1s intervals
