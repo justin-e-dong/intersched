@@ -5,7 +5,7 @@ import time
 from datetime import datetime
 import numpy as np
 
-DATA_DIR = "data"
+DATA_DIR = "data_2022-10-27"
 TRACE_DIR = "traces"
 
 def get_snapshot():

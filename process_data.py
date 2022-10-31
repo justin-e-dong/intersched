@@ -21,6 +21,9 @@ for dir_entry in os.scandir(trace_path):
 
 file_paths.sort()
 
+# only look at a small subset of the data
+file_paths = file_paths[100:200]
+
 for file_path in file_paths:
     with np.load(file_path) as res:
         snapshots = res["snapshots"]
@@ -67,10 +70,16 @@ plot_times = plot_times[1:]
 # plot the interrupt rate, rather than the number of interrupts
 # (change from the previous collection of interrupts)
 
-all_non_zero_indices = np.where(np.all(ints_change != 0, axis=0))[0]
-ints_rate_s_filtered = np.take(ints_rate_s, all_non_zero_indices, axis=1)
+ints_change_sum = np.sum(ints_change, axis=0)
 
-z_ind_set = set(all_non_zero_indices)
+k = 6
+topk_inds = np.argpartition(ints_change_sum, -k)[-k:]
+choose_inds = topk_inds
+# all_non_zero_indices = np.where(np.all(ints_change != 0, axis=0))[0]
+# choose_inds = all_non_zero_indices
+ints_rate_s_filtered = np.take(ints_rate_s, choose_inds, axis=1)
+
+z_ind_set = set(choose_inds)
 labels = []
 for (i, l) in enumerate(row_labels):
     if i in z_ind_set:
