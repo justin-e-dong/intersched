@@ -2,12 +2,13 @@ import os
 import json
 import numpy as np
 import matplotlib.pyplot as plt
-from base import DATA_DIR, TRACE_DIR
+from base import TRACE_DIR
 
-trace_path = f"{DATA_DIR}/{TRACE_DIR}"
+data_dir = "data_2022-10-27"
+trace_path = f"{data_dir}/{TRACE_DIR}"
 
 row_labels = None
-with open(f"{DATA_DIR}/row_labels.json") as f:
+with open(f"{data_dir}/row_labels.json") as f:
     row_labels = json.load(f)
 
 all_snapshots = []
@@ -22,7 +23,7 @@ for dir_entry in os.scandir(trace_path):
 file_paths.sort()
 
 # only look at a small subset of the data
-file_paths = file_paths[100:200]
+file_paths = file_paths[100:110]
 
 for file_path in file_paths:
     with np.load(file_path) as res:
@@ -36,6 +37,7 @@ times = np.concatenate(all_times)
 
 # 177 x 176
 # rows x cols
+# (177 interrupts) x (176 cores)
 
 ints_sum_across_cores = np.sum(snapshots, 2)
 
@@ -77,6 +79,9 @@ topk_inds = np.argpartition(ints_change_sum, -k)[-k:]
 choose_inds = topk_inds
 # all_non_zero_indices = np.where(np.all(ints_change != 0, axis=0))[0]
 # choose_inds = all_non_zero_indices
+
+choose_inds = np.sort(choose_inds)
+
 ints_rate_s_filtered = np.take(ints_rate_s, choose_inds, axis=1)
 
 z_ind_set = set(choose_inds)
@@ -84,6 +89,8 @@ labels = []
 for (i, l) in enumerate(row_labels):
     if i in z_ind_set:
         labels.append(l)
+
+sums_filtered = np.take(ints_sum_across_cores, choose_inds, axis=1)
 
 print(labels)
 print('Done processing, displaying plot now')
