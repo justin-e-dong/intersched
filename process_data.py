@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from base import TRACE_DIR
 
-data_dir = "data_2022-10-27"
+data_dir = "data_llvm_build_2022-11-03"
 trace_path = f"{data_dir}/{TRACE_DIR}"
 
 row_labels = None
@@ -23,7 +23,7 @@ for dir_entry in os.scandir(trace_path):
 file_paths.sort()
 
 # only look at a small subset of the data
-file_paths = file_paths[100:110]
+file_paths = file_paths[0:10]
 
 for file_path in file_paths:
     with np.load(file_path) as res:
