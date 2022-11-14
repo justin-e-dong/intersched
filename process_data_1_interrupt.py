@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from base import TRACE_DIR
 
-data_dir = "data_moore_2022_11_14"
+data_dir = "data_llvm_build_2022-11-03"
 trace_path = f"{data_dir}/{TRACE_DIR}"
 
 row_labels = None
@@ -23,7 +23,7 @@ for dir_entry in os.scandir(trace_path):
 file_paths.sort()
 
 # only look at a small subset of the data
-file_paths = file_paths[0:10]
+file_paths = file_paths[0:4]
 
 for file_path in file_paths:
     with np.load(file_path) as res:
@@ -35,11 +35,19 @@ for file_path in file_paths:
 snapshots = np.concatenate(all_snapshots)
 times = np.concatenate(all_times)
 
+cal_index = -1
+for (i, l) in enumerate(row_labels):
+    if l == "CAL":
+        cal_index = i
+
+snapshots = snapshots[:, cal_index:(cal_index+1), :]
+print(snapshots.shape)
+
 # 177 x 176
 # rows x cols
 # (177 interrupts) x (176 cores)
 
-ints_sum_across_interrupt_types = np.sum(snapshots, 1)
+ints_sum_across_cores = np.sum(snapshots, 2)
 
 def compute_change(arr):
     base = arr[0]
@@ -53,7 +61,7 @@ def compute_change(arr):
 # base = ints_sum_across_cores[0]
 # res = np.subtract(ints_sum_across_cores, base)
 
-ints_change = compute_change(ints_sum_across_interrupt_types)
+ints_change = compute_change(ints_sum_across_cores)
 time_change = compute_change(times)
 
 time_change_s = np.multiply(time_change, 1e-9)
@@ -66,24 +74,24 @@ plot_times = times - times[0]
 plot_times = np.multiply(plot_times, 1e-9)
 plot_times = plot_times[1:]
 
-# print(ints_rate_s)
-# print(plot_times)
-
-# plot the interrupt rate, rather than the number of interrupts
-# (change from the previous collection of interrupts)
-
-overall_rate_mean = np.mean(ints_rate_s[200:650])
-print(f"Overall Interrupt Rate Mean per CPU (during LLVM build): {overall_rate_mean}")
-
-# print(labels)
 print('Done processing, displaying plot now')
 
-plt.plot(plot_times, ints_rate_s)
+# plt.plot(plot_times, ints_rate_s)
 
-plt.title("Interrupt Rate For Each CPU")
+# plt.title("CAL Interrupt Rate (All cores)")
 
-plt.xlabel('Time (s)')
-plt.ylabel('Interrupt Rate (ints/s)')
+# plt.xlabel('Time (s)')
+# plt.ylabel('Interrupt Rate (ints/s)')
 
-plt.legend(loc='upper right')
-plt.show()
+# plt.legend(loc='upper right')
+# plt.show()
+
+final_str = ""
+ints_rate_s = ints_rate_s.reshape(-1)
+for i in range(ints_rate_s.shape[0]):
+    # t = plot_times[i].item()
+    v = ints_rate_s[i].item()
+    final_str += f"{i}\t{v}\n"
+
+with open("cal_seq.txt", "w") as f:
+    f.write(final_str)

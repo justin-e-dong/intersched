@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from base import TRACE_DIR
 
-data_dir = "data_llvm_build_2022-11-03"
+data_dir = "data_moore_2022_11_14"
 trace_path = f"{data_dir}/{TRACE_DIR}"
 
 row_labels = None
@@ -23,7 +23,7 @@ for dir_entry in os.scandir(trace_path):
 file_paths.sort()
 
 # only look at a small subset of the data
-file_paths = file_paths[0:4]
+file_paths = file_paths[0:10]
 
 for file_path in file_paths:
     with np.load(file_path) as res:
@@ -34,14 +34,6 @@ for file_path in file_paths:
 
 snapshots = np.concatenate(all_snapshots)
 times = np.concatenate(all_times)
-
-cal_index = -1
-for (i, l) in enumerate(row_labels):
-    if l == "CAL":
-        cal_index = i
-
-snapshots = snapshots[:, cal_index:(cal_index+1), :]
-print(snapshots.shape)
 
 # 177 x 176
 # rows x cols
@@ -74,24 +66,41 @@ plot_times = times - times[0]
 plot_times = np.multiply(plot_times, 1e-9)
 plot_times = plot_times[1:]
 
+# print(ints_rate_s)
+# print(plot_times)
+
+# plot the interrupt rate, rather than the number of interrupts
+# (change from the previous collection of interrupts)
+
+ints_change_sum = np.sum(ints_change, axis=0)
+
+k = 6
+topk_inds = np.argpartition(ints_change_sum, -k)[-k:]
+choose_inds = topk_inds
+# all_non_zero_indices = np.where(np.all(ints_change != 0, axis=0))[0]
+# choose_inds = all_non_zero_indices
+
+choose_inds = np.sort(choose_inds)
+
+ints_rate_s_filtered = np.take(ints_rate_s, choose_inds, axis=1)
+
+z_ind_set = set(choose_inds)
+labels = []
+for (i, l) in enumerate(row_labels):
+    if i in z_ind_set:
+        labels.append(l)
+
+sums_filtered = np.take(ints_sum_across_cores, choose_inds, axis=1)
+
+print(labels)
 print('Done processing, displaying plot now')
 
-# plt.plot(plot_times, ints_rate_s)
+plt.plot(plot_times, ints_rate_s_filtered, label=labels)
 
-# plt.title("CAL Interrupt Rate (All cores)")
+plt.title("Interrupt Rate Totalled Across Cores")
 
-# plt.xlabel('Time (s)')
-# plt.ylabel('Interrupt Rate (ints/s)')
+plt.xlabel('Time (s)')
+plt.ylabel('Interrupt Rate (ints/s)')
 
-# plt.legend(loc='upper right')
-# plt.show()
-
-final_str = ""
-ints_rate_s = ints_rate_s.reshape(-1)
-for i in range(ints_rate_s.shape[0]):
-    # t = plot_times[i].item()
-    v = ints_rate_s[i].item()
-    final_str += f"{i}\t{v}\n"
-
-with open("cal_seq.txt", "w") as f:
-    f.write(final_str)
+plt.legend(loc='upper right')
+plt.show()
