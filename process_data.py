@@ -89,9 +89,9 @@ print('Done processing, displaying plot now')
 final_str = ""
 ints_rate_s = ints_rate_s.reshape(-1)
 for i in range(ints_rate_s.shape[0]):
-    t = plot_times[i].item()
+    # t = plot_times[i].item()
     v = ints_rate_s[i].item()
-    final_str += f"{t} {v}\n"
+    final_str += f"{v}\n"
 
 with open("cal_seq.txt", "w") as f:
     f.write(final_str)
