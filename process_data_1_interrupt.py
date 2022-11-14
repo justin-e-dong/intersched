@@ -2,9 +2,9 @@ import os
 import json
 import numpy as np
 import matplotlib.pyplot as plt
-from base import TRACE_DIR
+from base import DATA_DIR, TRACE_DIR
 
-data_dir = "data_llvm_build_2022-11-03"
+data_dir = DATA_DIR
 trace_path = f"{data_dir}/{TRACE_DIR}"
 
 row_labels = None
