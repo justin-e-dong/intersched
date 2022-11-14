@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from base import TRACE_DIR
 
-data_dir = "data_llvm_build_2022-11-03"
+data_dir = "data_moore_2022_11_14"
 trace_path = f"{data_dir}/{TRACE_DIR}"
 
 row_labels = None
@@ -83,7 +83,7 @@ plt.plot(plot_times, ints_rate_s)
 plt.title("Interrupt Rate For Each CPU")
 
 plt.xlabel('Time (s)')
-plt.ylabel('Interrupt Rate')
+plt.ylabel('Interrupt Rate (ints/s)')
 
 plt.legend(loc='upper right')
 plt.show()
