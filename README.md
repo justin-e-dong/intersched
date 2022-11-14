@@ -13,7 +13,11 @@ Important note: need to consider that the Python script you are running to colle
 
 For using the SSH key I want to push to GitHub from the 4socket server:
 
-```git config --add --local core.sshCommand 'ssh -i ~/.ssh/int_traces'```
+```
+ssh-keygen -C "int_traces" -f ~/.ssh/int_traces -t ed25519
+GIT_SSH_COMMAND='ssh -i ~/.ssh/int_traces' git clone git@github.com:knagaitsev/interrupt-traces.git
+git config --add --local core.sshCommand 'ssh -i ~/.ssh/int_traces'
+```
 
 ## Numbers
 
