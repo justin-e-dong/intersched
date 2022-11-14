@@ -91,7 +91,7 @@ ints_rate_s = ints_rate_s.reshape(-1)
 for i in range(ints_rate_s.shape[0]):
     # t = plot_times[i].item()
     v = ints_rate_s[i].item()
-    final_str += f"{v}\n"
+    final_str += f"{i}\t{v}\n"
 
 with open("cal_seq.txt", "w") as f:
     f.write(final_str)
