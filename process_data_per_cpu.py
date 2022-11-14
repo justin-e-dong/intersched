@@ -39,7 +39,7 @@ times = np.concatenate(all_times)
 # rows x cols
 # (177 interrupts) x (176 cores)
 
-ints_sum_across_cores = np.sum(snapshots, 2)
+ints_sum_across_interrupt_types = np.sum(snapshots, 1)
 
 def compute_change(arr):
     base = arr[0]
@@ -53,7 +53,7 @@ def compute_change(arr):
 # base = ints_sum_across_cores[0]
 # res = np.subtract(ints_sum_across_cores, base)
 
-ints_change = compute_change(ints_sum_across_cores)
+ints_change = compute_change(ints_sum_across_interrupt_types)
 time_change = compute_change(times)
 
 time_change_s = np.multiply(time_change, 1e-9)
@@ -72,32 +72,15 @@ plot_times = plot_times[1:]
 # plot the interrupt rate, rather than the number of interrupts
 # (change from the previous collection of interrupts)
 
-ints_change_sum = np.sum(ints_change, axis=0)
+overall_rate_mean = np.mean(ints_rate_s[200:650])
+print(f"Overall Interrupt Rate Mean per CPU (during LLVM build): {overall_rate_mean}")
 
-k = 6
-topk_inds = np.argpartition(ints_change_sum, -k)[-k:]
-choose_inds = topk_inds
-# all_non_zero_indices = np.where(np.all(ints_change != 0, axis=0))[0]
-# choose_inds = all_non_zero_indices
-
-choose_inds = np.sort(choose_inds)
-
-ints_rate_s_filtered = np.take(ints_rate_s, choose_inds, axis=1)
-
-z_ind_set = set(choose_inds)
-labels = []
-for (i, l) in enumerate(row_labels):
-    if i in z_ind_set:
-        labels.append(l)
-
-sums_filtered = np.take(ints_sum_across_cores, choose_inds, axis=1)
-
-print(labels)
+# print(labels)
 print('Done processing, displaying plot now')
 
-plt.plot(plot_times, ints_rate_s_filtered, label=labels)
+plt.plot(plot_times, ints_rate_s)
 
-plt.title("Interrupt Rate Totalled Across Cores")
+plt.title("Interrupt Rate For Each CPU")
 
 plt.xlabel('Time (s)')
 plt.ylabel('Interrupt Rate (ints/s)')
