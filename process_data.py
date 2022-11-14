@@ -23,7 +23,7 @@ for dir_entry in os.scandir(trace_path):
 file_paths.sort()
 
 # only look at a small subset of the data
-file_paths = file_paths[0:10]
+file_paths = file_paths[0:4]
 
 for file_path in file_paths:
     with np.load(file_path) as res:
@@ -34,6 +34,14 @@ for file_path in file_paths:
 
 snapshots = np.concatenate(all_snapshots)
 times = np.concatenate(all_times)
+
+cal_index = -1
+for (i, l) in enumerate(row_labels):
+    if l == "CAL":
+        cal_index = i
+
+snapshots = snapshots[:, cal_index:(cal_index+1), :]
+print(snapshots.shape)
 
 # 177 x 176
 # rows x cols
@@ -72,35 +80,35 @@ plot_times = plot_times[1:]
 # plot the interrupt rate, rather than the number of interrupts
 # (change from the previous collection of interrupts)
 
-ints_change_sum = np.sum(ints_change, axis=0)
+# ints_change_sum = np.sum(ints_change, axis=0)
 
-k = 6
-topk_inds = np.argpartition(ints_change_sum, -k)[-k:]
-choose_inds = topk_inds
-# all_non_zero_indices = np.where(np.all(ints_change != 0, axis=0))[0]
-# choose_inds = all_non_zero_indices
+# k = 6
+# topk_inds = np.argpartition(ints_change_sum, -k)[-k:]
+# choose_inds = topk_inds
+# # all_non_zero_indices = np.where(np.all(ints_change != 0, axis=0))[0]
+# # choose_inds = all_non_zero_indices
 
-choose_inds = np.sort(choose_inds)
+# choose_inds = np.sort(choose_inds)
 
-ints_rate_s_filtered = np.take(ints_rate_s, choose_inds, axis=1)
+# ints_rate_s_filtered = np.take(ints_rate_s, choose_inds, axis=1)
 
-z_ind_set = set(choose_inds)
-labels = []
-for (i, l) in enumerate(row_labels):
-    if i in z_ind_set:
-        labels.append(l)
+# z_ind_set = set(choose_inds)
+# labels = []
+# for (i, l) in enumerate(row_labels):
+#     if i in z_ind_set:
+#         labels.append(l)
 
-sums_filtered = np.take(ints_sum_across_cores, choose_inds, axis=1)
+# sums_filtered = np.take(ints_sum_across_cores, axis=1)
 
-print(labels)
+# print(labels)
 print('Done processing, displaying plot now')
 
-plt.plot(plot_times, ints_rate_s_filtered, label=labels)
+plt.plot(plot_times, ints_rate_s)
 
-plt.title("Interrupt Rate")
+plt.title("CAL Interrupt Rate (All cores)")
 
 plt.xlabel('Time (s)')
-plt.ylabel('Interrupt Rate')
+plt.ylabel('Interrupt Rate (ints/s)')
 
 plt.legend(loc='upper right')
 plt.show()
