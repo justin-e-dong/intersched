@@ -74,41 +74,24 @@ plot_times = times - times[0]
 plot_times = np.multiply(plot_times, 1e-9)
 plot_times = plot_times[1:]
 
-# print(ints_rate_s)
-# print(plot_times)
-
-# plot the interrupt rate, rather than the number of interrupts
-# (change from the previous collection of interrupts)
-
-# ints_change_sum = np.sum(ints_change, axis=0)
-
-# k = 6
-# topk_inds = np.argpartition(ints_change_sum, -k)[-k:]
-# choose_inds = topk_inds
-# # all_non_zero_indices = np.where(np.all(ints_change != 0, axis=0))[0]
-# # choose_inds = all_non_zero_indices
-
-# choose_inds = np.sort(choose_inds)
-
-# ints_rate_s_filtered = np.take(ints_rate_s, choose_inds, axis=1)
-
-# z_ind_set = set(choose_inds)
-# labels = []
-# for (i, l) in enumerate(row_labels):
-#     if i in z_ind_set:
-#         labels.append(l)
-
-# sums_filtered = np.take(ints_sum_across_cores, axis=1)
-
-# print(labels)
 print('Done processing, displaying plot now')
 
-plt.plot(plot_times, ints_rate_s)
+# plt.plot(plot_times, ints_rate_s)
 
-plt.title("CAL Interrupt Rate (All cores)")
+# plt.title("CAL Interrupt Rate (All cores)")
 
-plt.xlabel('Time (s)')
-plt.ylabel('Interrupt Rate (ints/s)')
+# plt.xlabel('Time (s)')
+# plt.ylabel('Interrupt Rate (ints/s)')
 
-plt.legend(loc='upper right')
-plt.show()
+# plt.legend(loc='upper right')
+# plt.show()
+
+final_str = ""
+ints_rate_s = ints_rate_s.reshape(-1)
+for i in range(ints_rate_s.shape[0]):
+    t = plot_times[i].item()
+    v = ints_rate_s[i].item()
+    final_str += f"{t} {v}\n"
+
+with open("cal_seq.txt", "w") as f:
+    f.write(final_str)
