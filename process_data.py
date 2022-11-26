@@ -23,7 +23,7 @@ for dir_entry in os.scandir(trace_path):
 file_paths.sort()
 
 # only look at a small subset of the data
-file_paths = file_paths[0:10]
+file_paths = file_paths[2:4]
 
 for file_path in file_paths:
     with np.load(file_path) as res:
@@ -74,7 +74,7 @@ plot_times = plot_times[1:]
 
 ints_change_sum = np.sum(ints_change, axis=0)
 
-k = 6
+k = 1
 topk_inds = np.argpartition(ints_change_sum, -k)[-k:]
 choose_inds = topk_inds
 # all_non_zero_indices = np.where(np.all(ints_change != 0, axis=0))[0]
@@ -95,12 +95,12 @@ sums_filtered = np.take(ints_sum_across_cores, choose_inds, axis=1)
 print(labels)
 print('Done processing, displaying plot now')
 
-plt.plot(plot_times, ints_rate_s_filtered, label=labels)
+plt.plot(plot_times, ints_rate_s_filtered)
 
-plt.title("Interrupt Rate Totalled Across Cores")
+plt.title("Local Timer Interrupt Rate (48 CPUs)")
 
 plt.xlabel('Time (s)')
-plt.ylabel('Interrupt Rate (ints/s)')
+plt.ylabel('interrupts per second')
 
 plt.legend(loc='upper right')
 plt.show()
