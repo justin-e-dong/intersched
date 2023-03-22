@@ -72,8 +72,8 @@ plot_times = plot_times[1:]
 # plot the interrupt rate, rather than the number of interrupts
 # (change from the previous collection of interrupts)
 
-overall_rate_mean = np.mean(ints_rate_s[200:650])
-print(f"Overall Interrupt Rate Mean per CPU (during LLVM build): {overall_rate_mean}")
+overall_rate_mean = np.mean(ints_rate_s[0:1000])
+print(f"Overall Interrupt Rate Mean per CPU: {overall_rate_mean}")
 
 # print(labels)
 print('Done processing, displaying plot now')
@@ -86,4 +86,5 @@ plt.xlabel('Time (s)')
 plt.ylabel('Interrupt Rate (ints/s)')
 
 plt.legend(loc='upper right')
+plt.savefig(data_dir + "/interrupts_per_cpu.png")
 plt.show()

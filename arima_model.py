@@ -1,7 +1,11 @@
 import os
 import json
+import math
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
+from statsmodels.tsa.arima.model import ARIMA
+from sklearn.metrics import mean_squared_error
 from base import DATA_DIR, TRACE_DIR
 
 data_dir = DATA_DIR
@@ -22,9 +26,6 @@ for dir_entry in os.scandir(trace_path):
 
 file_paths.sort()
 
-# only look at a small subset of the data
-file_paths = file_paths[0:4]
-
 for file_path in file_paths:
     with np.load(file_path) as res:
         snapshots = res["snapshots"]
@@ -34,18 +35,6 @@ for file_path in file_paths:
 
 snapshots = np.concatenate(all_snapshots)
 times = np.concatenate(all_times)
-
-cal_index = -1
-for (i, l) in enumerate(row_labels):
-    if l == "CAL":
-        cal_index = i
-
-snapshots = snapshots[:, cal_index:(cal_index+1), :]
-print(snapshots.shape)
-
-# 177 x 176
-# rows x cols
-# (177 interrupts) x (176 cores)
 
 ints_sum_across_cores = np.sum(snapshots, 2)
 
@@ -58,9 +47,6 @@ def compute_change(arr):
     change = np.subtract(arr, shifted)
     return change[1:]
 
-# base = ints_sum_across_cores[0]
-# res = np.subtract(ints_sum_across_cores, base)
-
 ints_change = compute_change(ints_sum_across_cores)
 time_change = compute_change(times)
 
@@ -70,31 +56,50 @@ time_change_rep = time_change_s.reshape(-1, 1)
 time_change_rep = np.repeat(time_change_rep, ints_change.shape[1], axis=1)
 ints_rate_s = ints_change / time_change_rep
 
+# times
 plot_times = times - times[0]
 plot_times = np.multiply(plot_times, 1e-9)
 plot_times = plot_times[1:]
 
-print('Done processing, displaying plot now')
+ints_change_sum = np.sum(ints_change, axis=0)
 
-plt.plot(plot_times, ints_rate_s)
+k = 1
+topk_inds = np.argpartition(ints_change_sum, -k)[-k:]
+choose_inds = topk_inds
 
-plt.title("Interrupt Rate (All cores)")
+choose_inds = np.sort(choose_inds)
 
-plt.xlabel('Time (s)')
-plt.ylabel('Interrupt Rate (ints/s)')
+# highest interrupt rate
+ints_rate_s_filtered = np.take(ints_rate_s, choose_inds, axis=1)
 
-plt.legend(loc='upper right')
-plt.savefig(data_dir + "/all_interrupts.png")
+#############
+# Arima Model
+#############
+
+# https://machinelearningmastery.com/arima-for-time-series-forecasting-with-python/ 
+
+# initialize dataframe
+# plot_times = np.expand_dims(plot_times, axis=1)
+# concatenated = np.concatenate((plot_times, ints_rate_s_filtered), axis=1)
+# df = pd.DataFrame(concatenated, columns =['time', 'interrupt rate'])
+df = pd.DataFrame(ints_rate_s_filtered, columns =['interrupt rate'])
+
+# split into train and test sets
+X = df.values
+size = int(len(X) * 0.9990)
+train, test = X[0:size], X[size:len(X)]
+history = [x for x in train]
+
+model = ARIMA(history, order=(5,1,0))
+model_fit = model.fit()
+predictions = model_fit.forecast(len(test))
+
+# evaluate forecasts
+rmse = math.sqrt(mean_squared_error(test, predictions))
+print('Test RMSE: %.3f' % rmse)
+
+# plot forecasts against actual outcomes
+plt.plot(test)
+plt.plot(predictions, color='red')
 plt.show()
-
-'''
-final_str = ""
-ints_rate_s = ints_rate_s.reshape(-1)
-for i in range(ints_rate_s.shape[0]):
-    # t = plot_times[i].item()
-    v = ints_rate_s[i].item()
-    final_str += f"{i}\t{v}\n"
-
-with open("cal_seq.txt", "w") as f:
-    f.write(final_str)
-'''
+plt.savefig(data_dir + "/arima_model.png")

@@ -103,4 +103,5 @@ plt.xlabel('Time (s)')
 plt.ylabel('Interrupt Rate (ints/s)')
 
 plt.legend(loc='upper right')
+plt.savefig(data_dir + "/top_6_interrupts.png")
 plt.show()

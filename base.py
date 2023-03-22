@@ -4,13 +4,33 @@ import os
 import time
 from datetime import datetime
 import numpy as np
+import ctypes
 
-DATA_DIR = "data_llvm_build_2022-11-03"
+DATA_DIR = "moore_arima"
 TRACE_DIR = "traces"
+
+CLOCK_REALTIME = 0
+
+class timespec(ctypes.Structure):
+    _fields_ = [
+        ('tv_sec', ctypes.c_int64), # seconds, https://stackoverflow.com/q/471248/1672565
+        ('tv_nsec', ctypes.c_int64), # nanoseconds
+        ]
+
+clock_gettime = ctypes.cdll.LoadLibrary('libc.so.6').clock_gettime
+clock_gettime.argtypes = [ctypes.c_int64, ctypes.POINTER(timespec)]
+clock_gettime.restype = ctypes.c_int64    
+
+def time_ns():
+    tmp = timespec()
+    ret = clock_gettime(CLOCK_REALTIME, ctypes.pointer(tmp))
+    if bool(ret):
+        raise OSError()
+    return tmp.tv_sec * 10 ** 9 + tmp.tv_nsec
 
 def get_snapshot():
     full_data = None
-    now = time.time_ns()
+    now = time_ns()
     with open("/proc/interrupts", "r") as f:
         full_data = f.read()
 
