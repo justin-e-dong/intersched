@@ -1,6 +1,6 @@
 from base import collect_and_dump_trace
 
-max_iters = 100
+max_iters = 1
 for i in range(max_iters):
-    print("Count " + str(i * 100) + "/" + str(max_iters * 100))
-    collect_and_dump_trace(count=100)
+    print("Count " + str(i * 50) + "/" + str(max_iters * 50))
+    collect_and_dump_trace(count=50)

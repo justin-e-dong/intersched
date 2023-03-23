@@ -6,7 +6,10 @@ from datetime import datetime
 import numpy as np
 import ctypes
 
-DATA_DIR = "moore_arima"
+# redis_01: redis-benchmark -t set -n 1000000 -d 8 -c 100
+# redis_02: redis-benchmark -t get -n 1000000 -d 8 -c 100
+
+DATA_DIR = "redis_01"
 TRACE_DIR = "traces"
 
 CLOCK_REALTIME = 0
