@@ -9,7 +9,11 @@ import ctypes
 # redis_01: redis-benchmark -t set -n 1000000 -d 8 -c 100
 # redis_02: redis-benchmark -t get -n 1000000 -d 8 -c 100
 
-DATA_DIR = "redis_01"
+# postgres_01: pgbench -c 10 -j 100 -t 10000 testdb
+# postgres_02: pgbench -c 100 -j 100 -t 10000 -S testdb
+# postgres_03: pgbench -c 100 -j 100 -t 10000 -N testdb
+
+DATA_DIR = "postgres_03"
 TRACE_DIR = "traces"
 
 CLOCK_REALTIME = 0

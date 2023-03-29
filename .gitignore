@@ -173,3 +173,7 @@ moore_arima/
 
 redis_01/
 redis_02/
+
+postgres_01/
+postgres_02/
+postgres_03/
