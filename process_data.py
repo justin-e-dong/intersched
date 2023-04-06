@@ -23,7 +23,7 @@ for dir_entry in os.scandir(trace_path):
 file_paths.sort()
 
 # only look at a small subset of the data
-file_paths = file_paths[0:10]
+file_paths = file_paths[0:4]
 
 for file_path in file_paths:
     with np.load(file_path) as res:
@@ -74,7 +74,7 @@ plot_times = plot_times[1:]
 
 ints_change_sum = np.sum(ints_change, axis=0)
 
-k = 6
+k = 4
 topk_inds = np.argpartition(ints_change_sum, -k)[-k:]
 choose_inds = topk_inds
 # all_non_zero_indices = np.where(np.all(ints_change != 0, axis=0))[0]
@@ -90,18 +90,29 @@ for (i, l) in enumerate(row_labels):
     if i in z_ind_set:
         labels.append(l)
 
+for i in range(len(labels)):
+      if labels[i] == '157':
+        labels[i] = 'NET'
+      if labels[i] == '73':
+        labels[i] = 'DIS'
+
 sums_filtered = np.take(ints_sum_across_cores, choose_inds, axis=1)
 
 print(labels)
 print('Done processing, displaying plot now')
 
+fig, ax = plt.subplots(figsize=(9, 6))
+
 plt.plot(plot_times, ints_rate_s_filtered, label=labels)
 
-plt.title("Interrupt Rate Totalled Across Cores")
+plt.title("Interrupt Rate Totalled Across Cores, Top 4 Interrupts", fontsize=18)
 
-plt.xlabel('Time (s)')
-plt.ylabel('Interrupt Rate (ints/s)')
+plt.xticks(fontsize=14)
+plt.yticks(fontsize=14)
 
-plt.legend(loc='upper right')
-plt.savefig(data_dir + "/top_6_interrupts.png")
+plt.xlabel('Time (s)', fontsize=16)
+plt.ylabel('Interrupt Rate (ints/s)', fontsize=16)
+
+plt.legend(loc='upper right', fontsize=16)
+plt.savefig(data_dir + "/top_6_interrupts.pdf")
 plt.show()

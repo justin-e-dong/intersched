@@ -23,7 +23,7 @@ for dir_entry in os.scandir(trace_path):
 file_paths.sort()
 
 # only look at a small subset of the data
-file_paths = file_paths[0:10]
+file_paths = file_paths[0:4]
 
 for file_path in file_paths:
     with np.load(file_path) as res:
@@ -34,10 +34,6 @@ for file_path in file_paths:
 
 snapshots = np.concatenate(all_snapshots)
 times = np.concatenate(all_times)
-
-# 177 x 176
-# rows x cols
-# (177 interrupts) x (176 cores)
 
 ints_sum_across_interrupt_types = np.sum(snapshots, 1)
 
@@ -69,22 +65,30 @@ plot_times = plot_times[1:]
 # print(ints_rate_s)
 # print(plot_times)
 
+# num_cpus = ints_rate_s.shape[1]
+# print(ints_rate_s.shape)
+
 # plot the interrupt rate, rather than the number of interrupts
 # (change from the previous collection of interrupts)
 
-overall_rate_mean = np.mean(ints_rate_s[0:1000])
+overall_rate_mean = np.mean(ints_rate_s)
 print(f"Overall Interrupt Rate Mean per CPU: {overall_rate_mean}")
 
 # print(labels)
 print('Done processing, displaying plot now')
 
+fig, ax = plt.subplots(figsize=(9, 6))
+
 plt.plot(plot_times, ints_rate_s)
 
-plt.title("Interrupt Rate For Each CPU")
+plt.title("Interrupt Rate For Each CPU", fontsize=18)
 
-plt.xlabel('Time (s)')
-plt.ylabel('Interrupt Rate (ints/s)')
+plt.xticks(fontsize=14)
+plt.yticks(fontsize=14)
 
-plt.legend(loc='upper right')
-plt.savefig(data_dir + "/interrupts_per_cpu.png")
+plt.xlabel('Time (s)', fontsize=16)
+plt.ylabel('Interrupt Rate (ints/s)', fontsize=16)
+
+plt.legend(loc='upper right', fontsize=16)
+plt.savefig(data_dir + "/interrupts_per_cpu.pdf")
 plt.show()

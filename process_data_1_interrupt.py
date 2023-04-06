@@ -76,15 +76,20 @@ plot_times = plot_times[1:]
 
 print('Done processing, displaying plot now')
 
+fig, ax = plt.subplots(figsize=(9, 6))
+
 plt.plot(plot_times, ints_rate_s)
 
-plt.title("Interrupt Rate (All cores)")
+plt.title("Interrupt Rate (All cores)", fontsize=18)
 
-plt.xlabel('Time (s)')
-plt.ylabel('Interrupt Rate (ints/s)')
+plt.xlabel('Time (s)', fontsize=16)
+plt.ylabel('Interrupt Rate (ints/s)', fontsize=16)
 
-plt.legend(loc='upper right')
-plt.savefig(data_dir + "/all_interrupts.png")
+plt.xticks(fontsize=14)
+plt.yticks(fontsize=14)
+
+plt.legend(loc='upper right', fontsize=16)
+plt.savefig(data_dir + "/all_interrupts.pdf")
 plt.show()
 
 '''

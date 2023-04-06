@@ -171,9 +171,9 @@ setilab_2/
 moore_long/
 moore_arima/
 
-redis_01/
-redis_02/
+redis_*/
 
-postgres_01/
-postgres_02/
-postgres_03/
+/postgres_*/
+
+sql/
+redis/
