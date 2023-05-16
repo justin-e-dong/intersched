@@ -23,7 +23,7 @@ for dir_entry in os.scandir(trace_path):
 file_paths.sort()
 
 # only look at a small subset of the data
-file_paths = file_paths[0:4]
+# file_paths = file_paths[0:4]
 
 for file_path in file_paths:
     with np.load(file_path) as res:

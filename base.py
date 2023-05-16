@@ -6,16 +6,7 @@ from datetime import datetime
 import numpy as np
 import ctypes
 
-# redis_01: redis-benchmark -t get -n 1000000 -d 8 -c 100
-# redis_02: redis-benchmark -t set -n 1000000 -d 8 -c 100
-
-# postgres_01: pgbench -c 100 -j 100 -t 10000 testdb
-# postgres_02: pgbench -c 100 -j 100 -t 100000 -S testdb
-# postgres_03: pgbench -c 100 -j 100 -t 10000 -N testdb
-
-# postgres_06: pgbench -h localhost -p 5432 -U justin -c 100 -j 100 -T 100 testdb -f sql/random_parallel_writes.sql
-
-DATA_DIR = "postgres_12"
+DATA_DIR = "bt_1"
 TRACE_DIR = "traces"
 
 CLOCK_REALTIME = 0
