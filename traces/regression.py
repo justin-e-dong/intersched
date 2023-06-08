@@ -11,6 +11,7 @@ from clean_data import *
 
 input_file = sys.argv[1] + ".log"
 output_name = sys.argv[1]
+title_name = sys.argv[2]
 
 def parse_data(input_file):
     data = clean_data(input_file)
@@ -36,48 +37,50 @@ X = df["Entry"].values
 size = int(len(X) - 800)
 train, test = X[0:size], X[size:len(X)]
 
-predictions = []
-
-window_size = 40
-
+window_sizes = [10, 20, 100, 200]
 model = LinearRegression()
 
-for i in range(0, len(test), window_size):
+for window_size in window_sizes:
 
-    # Get window
-    window = np.arange(i + size - window_size, size + i)
-    window = window.reshape(-1, 1)
-    
-    # Get target values
-    targets = X[size + i - window_size : size + i]
-    targets = targets.reshape(-1, 1)
-    
-    # Fit model
-    model.fit(window, targets)
-    
-    # Predictions
-    next_X = np.arange(i + size, size + i + window_size)
-    next_X = next_X.reshape(-1, 1)
-    next_predictions = model.predict(next_X)
-    
-    # Update predictions array
-    next_predictions = next_predictions.reshape(-1)
-    predictions = np.concatenate((predictions, next_predictions))
+    predictions = []
 
-# Evaluate forecasts
-rmse = math.sqrt(mean_squared_error(test, predictions[:len(test)]))
-print('Test RMSE: %.3f' % rmse)
+    for i in range(0, len(test), window_size):
 
-mape = calculate_mape(test, predictions[:len(test)])
-print('Test MAPE: %.3f%%' % mape)
+        # Get window
+        window = np.arange(i + size - window_size, size + i)
+        window = window.reshape(-1, 1)
+        
+        # Get target values
+        targets = X[size + i - window_size : size + i]
+        targets = targets.reshape(-1, 1)
+        
+        # Fit model
+        model.fit(window, targets)
+        
+        # Predictions
+        next_X = np.arange(i + size, size + i + window_size)
+        next_X = next_X.reshape(-1, 1)
+        next_predictions = model.predict(next_X)
+        
+        # Update predictions array
+        next_predictions = next_predictions.reshape(-1)
+        predictions = np.concatenate((predictions, next_predictions))
 
-# Plot forecasts against actual outcomes
-ax = plt.axes()
-ax.plot(test, color='blue', label='Actual')
-ax.plot(predictions, color='red', label='Prediction')
-ax.set_xlabel('Number of Interrupts')
-ax.set_ylabel('Time from Start (s)')
-ax.set_title('Interrupt Predictions')
-ax.legend()
-plt.show()
-plt.savefig("./" + output_name + "_arima.pdf")
+    # Evaluate forecasts
+    # rmse = math.sqrt(mean_squared_error(test, predictions[:len(test)]))
+    # print('Test RMSE: %.3f' % rmse)
+
+    mape = calculate_mape(test, predictions[:len(test)])
+    print("Test MAPE for " + title_name + " LR with Window of " + str(window_size) + ": %.3f%%" % mape)
+
+    # Plot forecasts against actual outcomes
+    plt.figure()
+    ax = plt.axes()
+    ax.plot(test, color='blue', label='Actual')
+    ax.plot(predictions, color='red', label='Prediction')
+    ax.set_xlabel('Number of Interrupts')
+    ax.set_ylabel('Time from Start (s)')
+    ax.set_title(title_name + " LR Interrupt Predictions with Window of " + str(window_size))
+    ax.legend()
+    plt.show()
+    plt.savefig("./output/" + output_name + "_reg_" + "window" + str(window_size) + ".pdf")
