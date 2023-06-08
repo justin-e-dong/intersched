@@ -31,8 +31,6 @@ def calculate_mape(y_true, y_pred):
 
 df = parse_data(input_file)
 
-window = 1
-
 # Split into train and test sets
 X = df["Entry"].values
 size = int(len(X) - 800)
@@ -45,9 +43,9 @@ for window_size in window_sizes:
     predictions = []
 
     # Make predictions
-    for i in range(0, len(test), window_size):
+    for i in range(0, len(test)):
 
-        predictions.append(X[i + size - 10])
+        predictions.append(X[i + size - window_size])
 
     # Evaluate forecasts
     rmse = math.sqrt(mean_squared_error(test, predictions[:len(test)]))
