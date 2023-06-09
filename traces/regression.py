@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 from clean_data import *
 
 input_file = sys.argv[1] + ".log"
-output_name = sys.argv[1]
-title_name = sys.argv[2]
+output_name = sys.argv[2]
+title_name = sys.argv[3]
 
 def parse_data(input_file):
     data = clean_data(input_file)
@@ -34,10 +34,10 @@ df = parse_data(input_file)
 
 # Split into train and test sets
 X = df["Entry"].values
-size = int(len(X) - 800)
-train, test = X[0:size], X[size:len(X)]
+size = int(len(X) - 200 - 800)
+train, test = X[0:size], X[size:len(X) - 200]
 
-window_sizes = [10, 20, 100, 200]
+window_sizes = [10, 20, 40, 60, 80, 100, 150, 200]
 model = LinearRegression()
 
 for window_size in window_sizes:
@@ -67,11 +67,12 @@ for window_size in window_sizes:
         predictions = np.concatenate((predictions, next_predictions))
 
     # Evaluate forecasts
-    # rmse = math.sqrt(mean_squared_error(test, predictions[:len(test)]))
-    # print('Test RMSE: %.3f' % rmse)
+    rmse = math.sqrt(mean_squared_error(test, predictions[:len(test)]))
+    print("Test RMSE for " + title_name + " LR with Window of " + str(window_size) + ": %.3f" % rmse)
+    # print(rmse)
 
-    mape = calculate_mape(test, predictions[:len(test)])
-    print("Test MAPE for " + title_name + " LR with Window of " + str(window_size) + ": %.3f%%" % mape)
+    # mape = calculate_mape(test, predictions[:len(test)])
+    # print("Test MAPE for " + title_name + " LR with Window of " + str(window_size) + ": %.3f%%" % mape)
 
     # Plot forecasts against actual outcomes
     plt.figure()
@@ -83,4 +84,4 @@ for window_size in window_sizes:
     ax.set_title(title_name + " LR Interrupt Predictions with Window of " + str(window_size))
     ax.legend()
     plt.show()
-    plt.savefig("./output/" + output_name + "_reg_" + "window" + str(window_size) + ".pdf")
+    plt.savefig("./figures/" + output_name + "_reg_" + "window" + str(window_size) + ".pdf")
