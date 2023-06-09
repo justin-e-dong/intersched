@@ -40,9 +40,48 @@ def clean_traces(input_file, output_file):
     num_interrupts = len(data)
 
     with open(output_file, 'w') as file_write:
-                    file_write.write(output_string + "\n")
+        file_write.write(output_string + "\n")
 
     return num_irqs, unique_irqs, num_interrupts, data
 
+def entry_times(input_file, output_file):
+    data = []
+    line_number = 0
+    start_time = 0
+    unique_irqs = set()
+    num_irqs = 0
+    num_interrupts = 0
+    output_string = ""
+    with open(input_file, "r") as file:
+        entry_time = ""
+        for line in file:
+            line_number += 1
+            line = line.strip()
 
-clean_traces(input_file, output_file)
+            if line_number == 2:
+                start_time = float(line.split()[2].split(":")[0])
+
+            if "entry" in line:
+                entry_time = float(line.split()[2].split(":")[0]) - start_time
+            if "exit" in line:
+                if "vector" in line:
+                    irq_number = line.split("vector=")[1].split()[0]
+                else:
+                    irq_number = line.split("irq=")[1].split()[0]
+                exit_time = float(line.split()[2].split(":")[0]) - start_time
+                interrupt_length = exit_time - entry_time
+                event = line.split()[3].rstrip(":")
+                curr_string = "IRQ: {}, Entry: {}, Length: {}".format(irq_number, entry_time, interrupt_length)
+                data.append(curr_string)
+                output_string += str(entry_time) + "\n"
+                unique_irqs.add(irq_number)
+    unique_irqs = list(unique_irqs)
+    num_irqs = len(unique_irqs)
+    num_interrupts = len(data)
+
+    with open(output_file, 'w') as file_write:
+        file_write.write(output_string + "\n")
+
+    return num_irqs, unique_irqs, num_interrupts, data
+
+entry_times(input_file, output_file)
