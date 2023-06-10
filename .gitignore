@@ -176,10 +176,6 @@ redis_*/
 
 sql/
 redis/
-
 markov.py
-
-llvm_data/
-llvm.log
 
 .vscode
